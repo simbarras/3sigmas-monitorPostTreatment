@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/getsentry/sentry-go"
+	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/acquisition"
+	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/env"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/equation"
 	"log"
 )
@@ -39,6 +41,19 @@ func main() {
 	//}
 
 	log.Printf("App started in release %s\n", Version)
-	add := equation.Addition{}
-	log.Printf("10 + 30 = %d\n", add.Compute(10, 30))
+	environment := env.Read()
+
+	captors := []string{"KM_000_D", "KM_000_G", "KM_035_D"}
+	dataReader := acquisition.NewInflux(environment)
+	resultMap := dataReader.GetLastValue("production.3s_230913.trimble", captors)
+	log.Printf("Result: %v\n", resultMap)
+
+	variables := [][]string{
+		{"KM_000_D", "KM_000_G"},
+		{"KM_000_G", "KM_035_D"},
+		{"KM_035_D", "KM_035_G"},
+	}
+	results := equation.ComputeAll(variables, resultMap, equation.Addition{})
+	log.Printf("Results: %v\n", results)
+
 }

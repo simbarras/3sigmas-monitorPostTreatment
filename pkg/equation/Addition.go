@@ -2,6 +2,6 @@ package equation
 
 type Addition struct{}
 
-func (Addition) Compute(a int, b int) int {
-	return a + b
+func (Addition) Compute(variables []string, values map[string]float64) float64 {
+	return values[variables[0]] + values[variables[1]]
 }
