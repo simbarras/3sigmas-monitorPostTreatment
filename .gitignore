@@ -2,3 +2,4 @@ backup/
 .idea/
 *.iml
 .env
+db/

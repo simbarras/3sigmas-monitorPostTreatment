@@ -2,6 +2,7 @@ package equation
 
 type Equation interface {
 	Compute(variables []string, values map[string]float64) float64
+	Name() string
 }
 
 func ComputeAll(listVariables [][]string, values map[string]float64, eq Equation) []float64 {

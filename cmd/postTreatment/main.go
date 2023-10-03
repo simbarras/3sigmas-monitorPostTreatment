@@ -2,22 +2,23 @@ package main
 
 import (
 	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
+	"github.com/gin-gonic/gin"
+	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/api"
+	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/api/storage"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/acquisition"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/equation"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
-	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
 	"log"
-	"time"
 )
 
 const Version = "0.0.1"
+const ApiPrefix = "/api/v0"
 
 func main() {
 
 	// To initialize Sentry's handler, you need to initialize Sentry itself beforehand
 	if err := sentry.Init(sentry.ClientOptions{
-		Dsn:           "https://90bf7224527f47d66c14459f656c7a6c@o4505048574001152.ingest.sentry.io/4505985728512000",
+		Dsn:           "https://abad48b1066aff88bd3cdc1cef48a17b@o4505048574001152.ingest.sentry.io/4505987080388608",
 		EnableTracing: true,
 		// Set TracesSampleRate to 1.0 to capture 100%
 		// of transactions for performance monitoring.
@@ -27,45 +28,24 @@ func main() {
 	}); err != nil {
 		log.Fatalf("sentry.Init: %s", err)
 	}
-
-	//// Create an instance of sentryfasthttp
-	//sentryHandler := sentryfasthttp.New(sentryfasthttp.Options{})
-	//
-	//// After creating the instance, you can attach the handler as one of your middleware
-	//fastHTTPHandler := sentryHandler.Handle(func(ctx *fasthttp.RequestCtx) {
-	//	panic("y tho")
-	//})
-	//
-	//fmt.Println("Listening and serving HTTP on :3000")
-	//
-	//// And run it
-	//if err := fasthttp.ListenAndServe(":3000", fastHTTPHandler); err != nil {
-	//	panic(err)
-	//}
+	// Then create your app
+	app := gin.Default()
+	// Once it's done, you can attach the handler as one of your middleware
+	app.Use(sentrygin.New(sentrygin.Options{}))
 
 	log.Printf("App started in release %s\n", Version)
 	environment := data.ReadEnv()
 
-	captors := []string{"KM_000_D", "KM_000_G", "KM_035_D"}
-	dataReader := acquisition.NewInflux(environment)
-	resultMap := dataReader.GetLastValue("production.3s_230913.trimble", captors)
-	log.Printf("Result: %v\n", resultMap)
+	// Set up routes
+	api.SetRoutes(app, ApiPrefix)
 
-	variables := [][]string{
-		{"KM_000_D", "KM_000_G"},
-		{"KM_000_G", "KM_035_D"},
-		{"KM_035_D", "KM_035_G"},
-	}
-	results := equation.ComputeAll(variables, resultMap, equation.Addition{})
-	log.Printf("Results: %v\n", results)
-
-	measures := core.BuildMeasure(variables, results, time.Now(), "Addition")
-	log.Printf("Measures: %v\n", measures)
-
-	influxStorer := storer.NewInfluxStorer(environment)
-	err := influxStorer.Store("3s_230913", "trimble.computed", measures)
+	// And run it
+	err := app.Run("localhost:3000")
 	if err != nil {
-		sentry.CaptureException(err)
-		log.Fatalf("Error storing measures: %s\n", err.Error())
+		return
 	}
+
+	core.DummyMain(environment)
+	storage.NewPostgres()
+
 }
