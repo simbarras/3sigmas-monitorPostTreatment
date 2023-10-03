@@ -6,9 +6,9 @@ FROM golang:alpine AS builder
 # Git is required for fetching the dependencies.
 RUN apk update && apk add --no-cache git build-base
 WORKDIR $GOPATH/src/mypackage/myapp/
-COPY .github/workflows .
+COPY . .
 # Build the binary.
-RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux GIN_MODE=release go build -ldflags="-w -s" -o /go/bin/postTreatment cmd/postTreatment/main.go
+RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags="-w -s" -o /go/bin/postTreatment cmd/postTreatment/main.go
 
 ############################
 # STEP 2 build a small image
