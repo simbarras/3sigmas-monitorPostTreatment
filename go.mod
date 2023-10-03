@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/getsentry/sentry-go v0.24.1
 	github.com/influxdata/influxdb-client-go/v2 v2.12.3
+	github.com/simbarras/3sigmas-monitorVisualization v0.0.0-20231003091327-4e018edee964
 )
 
 require (

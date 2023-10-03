@@ -6,7 +6,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/env"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"log"
 )
 
@@ -15,7 +15,7 @@ type Influx struct {
 	organization *domain.Organization
 }
 
-func NewInflux(env env.Env) *Influx {
+func NewInflux(env data.Env) *Influx {
 	client := influxdb2.NewClient(env.InfluxUrl, env.InfluxToken)
 	org, err := client.OrganizationsAPI().FindOrganizationByName(context.Background(), env.InfluxOrg)
 	if err != nil {

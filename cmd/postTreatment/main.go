@@ -2,10 +2,13 @@ package main
 
 import (
 	"github.com/getsentry/sentry-go"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/acquisition"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/env"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/equation"
+	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core"
+	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/acquisition"
+	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/equation"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
 	"log"
+	"time"
 )
 
 const Version = "0.0.1"
@@ -41,7 +44,7 @@ func main() {
 	//}
 
 	log.Printf("App started in release %s\n", Version)
-	environment := env.Read()
+	environment := data.ReadEnv()
 
 	captors := []string{"KM_000_D", "KM_000_G", "KM_035_D"}
 	dataReader := acquisition.NewInflux(environment)
@@ -56,4 +59,13 @@ func main() {
 	results := equation.ComputeAll(variables, resultMap, equation.Addition{})
 	log.Printf("Results: %v\n", results)
 
+	measures := core.BuildMeasure(variables, results, time.Now(), "Addition")
+	log.Printf("Measures: %v\n", measures)
+
+	influxStorer := storer.NewInfluxStorer(environment)
+	err := influxStorer.Store("3s_230913", "trimble.computed", measures)
+	if err != nil {
+		sentry.CaptureException(err)
+		log.Fatalf("Error storing measures: %s\n", err.Error())
+	}
 }
