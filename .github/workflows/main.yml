@@ -49,7 +49,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          target: dataReader
+          target: postTreatment
           push: true
           tags: ${{ steps.meta.outputs.tags }}-${{ env.IMAGE_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
