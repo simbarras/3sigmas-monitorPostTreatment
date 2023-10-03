@@ -2,10 +2,11 @@ package main
 
 import (
 	"github.com/getsentry/sentry-go"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/equation"
 	"log"
 )
+
+const Version = "0.0.1"
 
 func main() {
 
@@ -17,7 +18,7 @@ func main() {
 		// of transactions for performance monitoring.
 		// We recommend adjusting this value in production,
 		TracesSampleRate: 1.0,
-		Release:          pkg.Version,
+		Release:          Version,
 	}); err != nil {
 		log.Fatalf("sentry.Init: %s", err)
 	}
@@ -37,7 +38,7 @@ func main() {
 	//	panic(err)
 	//}
 
-	log.Printf("App started in release %s\n", pkg.Version)
+	log.Printf("App started in release %s\n", Version)
 	add := equation.Addition{}
 	log.Printf("10 + 30 = %d\n", add.Compute(10, 30))
 }
