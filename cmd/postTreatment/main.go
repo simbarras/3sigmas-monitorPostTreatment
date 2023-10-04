@@ -36,8 +36,10 @@ func main() {
 	log.Printf("App started in release %s\n", Version)
 	environment := data.ReadEnv()
 
+	store := storage.NewPostgres()
+
 	// Set up routes
-	api.SetRoutes(app, ApiPrefix)
+	api.SetRoutes(app, ApiPrefix, store)
 
 	// And run it
 	err := app.Run("localhost:3000")
@@ -46,6 +48,5 @@ func main() {
 	}
 
 	core.DummyMain(environment)
-	storage.NewPostgres()
 
 }

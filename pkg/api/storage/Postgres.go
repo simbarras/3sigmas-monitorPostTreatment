@@ -2,7 +2,6 @@ package storage
 
 import (
 	"github.com/getsentry/sentry-go"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/equation"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/data"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -21,17 +20,17 @@ func NewPostgres() *PostgresStore {
 	}
 	err = db.AutoMigrate(&data.Action{})
 	if err != nil {
-		return nil
+		sentry.CaptureException(err)
+		panic("failed to migrate database: " + err.Error())
 	}
-
-	db.Create(&data.Action{
-		BucketName:    "production.3s_230913.trimble",
-		EquationName:  equation.Addition{}.Name(),
-		ListVariables: "KM_000_D,KM_000_G;",
-		Active:        true,
-	})
 
 	return &PostgresStore{
 		db: db,
 	}
+}
+
+func (p *PostgresStore) GetAllActions() []data.Action {
+	var actions []data.Action
+	p.db.Find(&actions)
+	return actions
 }
