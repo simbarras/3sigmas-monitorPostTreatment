@@ -32,6 +32,8 @@ func main() {
 	app := gin.Default()
 	// Once it's done, you can attach the handler as one of your middleware
 	app.Use(sentrygin.New(sentrygin.Options{}))
+	// Set cors policy
+	app.Use(api.CustomMiddleware())
 
 	log.Printf("App started in release %s\n", Version)
 	environment := data.ReadEnv()
@@ -42,7 +44,7 @@ func main() {
 	api.SetRoutes(app, ApiPrefix, store)
 
 	// And run it
-	err := app.Run("localhost:3000")
+	err := app.Run("localhost:3001")
 	if err != nil {
 		return
 	}
