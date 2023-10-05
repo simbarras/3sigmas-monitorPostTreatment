@@ -36,3 +36,16 @@ func (w *Worker) GetFunctions() []string {
 	}
 	return res
 }
+
+func (w *Worker) AddAction(action data.Action) {
+	w.postgres.AddAction(action)
+}
+
+func (w *Worker) UpdateAction(action data.Action) {
+	w.postgres.UpdateAction(action)
+}
+
+func (w *Worker) DeleteAction(id string) {
+	action := w.postgres.FindAction(id)
+	w.postgres.DeleteAction(action)
+}

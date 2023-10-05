@@ -1,7 +1,7 @@
 <template>
   <v-card title="Action" variant="tonal" style="margin-bottom: 2rem;">
     <v-card-subtitle>
-      {{existAction.ID}}
+      {{existAction.id}}
     </v-card-subtitle>
     <v-form>
       <v-container>
@@ -13,7 +13,7 @@
             <v-combobox
               label="Bucket"
               :items="bucketList"
-              v-model="existAction.BucketName"
+              v-model="existAction.bucketName"
             ></v-combobox>
           </v-col>
 
@@ -24,7 +24,7 @@
             <v-combobox
               label="Fonction"
               :items="equationList"
-              v-model="existAction.EquationName"
+              v-model="existAction.equationName"
             ></v-combobox>
           </v-col>
 
@@ -32,21 +32,21 @@
             cols="12"
             md="2"
           >
-            <v-checkbox label="Active" v-model="existAction.Active"></v-checkbox>
+            <v-checkbox label="Active" v-model="existAction.active"></v-checkbox>
           </v-col>
 
           <v-col
             cols="12"
             md="1"
           >
-            <v-btn icon="mdi-upload">
+            <v-btn icon="mdi-upload" @click="actionStore.uploadAction(existAction)" >
             </v-btn>
           </v-col>
           <v-col
             cols="12"
             md="1"
           >
-            <v-btn icon="mdi-delete-forever">
+            <v-btn icon="mdi-delete-forever" @click="actionStore.deleteAction(existAction)">
             </v-btn>
           </v-col>
         </v-row>
@@ -55,7 +55,7 @@
             cols="12"
             md="12"
           >
-            <v-textarea label="Variables" v-model="existAction.ListVariables"></v-textarea>
+            <v-textarea label="Variables" v-model="existAction.listVariables"></v-textarea>
           </v-col>
         </v-row>
       </v-container>
@@ -67,6 +67,9 @@
 
 import {defineProps} from "vue";
 import {Action} from "@/plugins/data";
+import {useActionStore} from "@/store/app";
+
+const actionStore = useActionStore();
 
 defineProps({
   existAction: {

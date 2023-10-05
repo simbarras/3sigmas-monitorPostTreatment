@@ -17,13 +17,31 @@ export const useActionStore = defineStore('action', () => {
     function fetchActions() {
         axios.get(`${API_BASE}/action`)
             .then(res => {
+                actionList.value = res.data as Action[]
+            })
+    }
+
+    function uploadAction(action: Action){
+        axios.post(`${API_BASE}/action`, action)
+            .then(res => {
+                actionList.value = res.data as Action[]
+            })
+    }
+
+    function deleteAction(action: Action){
+        console.log(action)
+        axios.delete(`${API_BASE}/action/${action.id}`)
+            .then(res => {
                 console.log(res.data)
                 actionList.value = res.data as Action[]
                 console.log(actionList.value)
             })
+            .catch(err => {
+                console.log(err)
+            })
     }
 
-    return {actionList, getActionList, fetchActions}
+    return {actionList, getActionList, fetchActions, uploadAction, deleteAction}
 
 })
 
@@ -36,9 +54,7 @@ export const useBucketStore = defineStore('bucket', () => {
     function fetchBuckets() {
         axios.get(`${API_BASE}/bucket`)
             .then(res => {
-                console.log(res.data)
                 bucketList.value = res.data as string[]
-                console.log(bucketList.value)
             })
     }
 
@@ -54,9 +70,7 @@ export const useEquationStore = defineStore('equation', () => {
     function fetchEquations() {
         axios.get(`${API_BASE}/function`)
             .then(res => {
-                console.log(res.data)
                 equationList.value = res.data as string[]
-                console.log(equationList.value)
             })
     }
 
