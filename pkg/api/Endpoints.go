@@ -52,16 +52,19 @@ func (s *Server) getAction(ctx *gin.Context) {
 }
 
 func (s *Server) postAction(ctx *gin.Context) {
-	var action data.Action
-	err := ctx.BindJSON(&action)
+	var actionRequest data.AddActionRequest
+	err := ctx.BindJSON(&actionRequest)
 	if err != nil {
 		sentry.CaptureException(err)
-		ctx.String(500, "Error while binding JSON")
-		log.Fatalf("Error while binding JSON: %s", err)
+		ctx.String(500, "Error while parsing request")
+		log.Fatalf("Error while parsing request: %s\n", err)
 	}
+	action := data.ToAction(actionRequest)
 	if action.ID == uuid.Nil {
+		log.Printf("Adding action for bucket %s\n", action.BucketName)
 		s.worker.AddAction(action)
 	} else {
+		log.Printf("Updating action %s\n", action.ID)
 		s.worker.UpdateAction(action)
 	}
 	s.getAction(ctx)

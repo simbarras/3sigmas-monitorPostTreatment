@@ -13,3 +13,25 @@ type Action struct {
 	ListVariables string    `json:"listVariables"`
 	Active        bool      `json:"active"`
 }
+
+func ToAction(request AddActionRequest) Action {
+	id, err := uuid.Parse(request.ID)
+	if err != nil {
+		id = uuid.Nil
+	}
+	return Action{
+		ID:            id,
+		BucketName:    request.BucketName,
+		EquationName:  request.EquationName,
+		ListVariables: request.ListVariables,
+		Active:        request.Active,
+	}
+}
+
+type AddActionRequest struct {
+	ID            string `json:"id"`
+	BucketName    string `json:"bucketName"`
+	EquationName  string `json:"equationName"`
+	ListVariables string `json:"listVariables"`
+	Active        bool   `json:"active"`
+}

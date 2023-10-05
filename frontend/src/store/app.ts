@@ -41,7 +41,16 @@ export const useActionStore = defineStore('action', () => {
             })
     }
 
-    return {actionList, getActionList, fetchActions, uploadAction, deleteAction}
+    function preAddAction() {
+        const a = new Action()
+        a.active = false
+        a.bucketName = ""
+        a.equationName = ""
+        a.listVariables = ""
+        actionList.value.push(a)
+    }
+
+    return {actionList, getActionList, fetchActions, uploadAction, deleteAction, preAddAction}
 
 })
 
