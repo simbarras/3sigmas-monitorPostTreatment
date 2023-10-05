@@ -2,11 +2,10 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/api/storage"
 )
 
 type Server struct {
-	Store *storage.PostgresStore
+	worker *Worker
 }
 
 func CustomMiddleware() gin.HandlerFunc {
@@ -25,9 +24,9 @@ func CustomMiddleware() gin.HandlerFunc {
 	}
 }
 
-func SetRoutes(app *gin.Engine, prefix string, store *storage.PostgresStore) {
+func SetRoutes(app *gin.Engine, prefix string, worker *Worker) {
 	s := Server{
-		Store: store,
+		worker: worker,
 	}
 
 	app.GET(prefix+"/action", s.getAction)
@@ -36,7 +35,8 @@ func SetRoutes(app *gin.Engine, prefix string, store *storage.PostgresStore) {
 	app.DELETE(prefix+"/action", deleteAction)
 	app.POST(prefix+"/trigger/bucket/:bucketName", postTriggerBucket)
 	app.POST(prefix+"/trigger/action/:actionID", postTriggerAction)
-	app.GET(prefix+"/bucket", getBucket)
+	app.GET(prefix+"/bucket", s.getBucket)
+	app.GET(prefix+"/function", s.getFunction)
 	app.GET(prefix+"/health", func(ctx *gin.Context) {
 		ctx.String(200, "OK")
 	})
@@ -44,7 +44,7 @@ func SetRoutes(app *gin.Engine, prefix string, store *storage.PostgresStore) {
 
 // getAction Get all actions
 func (s *Server) getAction(ctx *gin.Context) {
-	res := s.Store.GetAllActions()
+	res := s.worker.GetActions()
 	ctx.JSON(200, res)
 }
 
@@ -68,6 +68,10 @@ func postTriggerAction(ctx *gin.Context) {
 	ctx.String(500, "POST trigger action not implemented yet")
 }
 
-func getBucket(ctx *gin.Context) {
-	ctx.String(500, "GET bucket not implemented yet")
+func (s *Server) getBucket(ctx *gin.Context) {
+	ctx.JSON(200, s.worker.GetBuckets())
+}
+
+func (s *Server) getFunction(ctx *gin.Context) {
+	ctx.JSON(200, s.worker.GetFunctions())
 }

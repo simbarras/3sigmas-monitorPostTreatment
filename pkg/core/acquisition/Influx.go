@@ -28,6 +28,19 @@ func NewInflux(env data.Env) *Influx {
 	}
 }
 
+func (i *Influx) GetBuckets() []string {
+	buckets, err := i.client.BucketsAPI().GetBuckets(context.Background())
+	if err != nil {
+		sentry.CaptureException(err)
+		log.Fatal(err)
+	}
+	result := make([]string, len(*buckets))
+	for i, bucket := range *buckets {
+		result[i] = bucket.Name
+	}
+	return result
+}
+
 func (i *Influx) GetLastValue(bucketName string, captors []string) map[string]float64 {
 	resultMap := make(map[string]float64)
 	for _, captor := range captors {
