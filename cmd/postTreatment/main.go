@@ -10,6 +10,7 @@ import (
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/acquisition"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/equation"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
 	"log"
 )
 
@@ -41,8 +42,9 @@ func main() {
 	environment := data.ReadEnv()
 
 	store := storage.NewPostgres()
+	influxStore := storer.NewInfluxStorer(environment)
 	equations := []equation.Equation{equation.Addition{}, equation.Fleche{}}
-	worker := api.NewWorker(acquisition.NewInflux(environment), store, equations)
+	worker := api.NewWorker(acquisition.NewInflux(environment), store, equations, influxStore)
 
 	// Set up routes
 	api.SetRoutes(app, ApiPrefix, worker)

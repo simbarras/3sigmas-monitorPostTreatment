@@ -19,7 +19,7 @@
 
           <v-col
             cols="12"
-            md="4"
+            md="3"
           >
             <v-combobox
               label="Fonction"
@@ -33,6 +33,14 @@
             md="2"
           >
             <v-checkbox label="Active" v-model="existAction.active"></v-checkbox>
+          </v-col>
+
+          <v-col
+              cols="12"
+              md="1"
+          >
+            <v-btn icon="mdi-bullseye-arrow" @click="actionStore.triggerAction(existAction)" >
+            </v-btn>
           </v-col>
 
           <v-col
@@ -68,6 +76,7 @@
 import {defineProps} from "vue";
 import {Action} from "@/plugins/data";
 import {useActionStore} from "@/store/app";
+import axios from "axios";
 
 const actionStore = useActionStore();
 
@@ -85,5 +94,6 @@ defineProps({
     required: true
   }
 })
+
 
 </script>

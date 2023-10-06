@@ -36,8 +36,8 @@ func SetRoutes(app *gin.Engine, prefix string, worker *Worker) {
 	app.GET(prefix+"/action", s.getAction)
 	app.POST(prefix+"/action", s.postAction)
 	app.DELETE(prefix+"/action/:id", s.deleteAction)
-	app.POST(prefix+"/trigger/bucket/:bucketName", postTriggerBucket)
-	app.POST(prefix+"/trigger/action/:actionID", postTriggerAction)
+	app.POST(prefix+"/trigger/bucket/:name", s.postTriggerBucket)
+	app.POST(prefix+"/trigger/action/:id", s.postTriggerAction)
 	app.GET(prefix+"/bucket", s.getBucket)
 	app.GET(prefix+"/function", s.getFunction)
 	app.GET(prefix+"/health", func(ctx *gin.Context) {
@@ -77,12 +77,18 @@ func (s *Server) deleteAction(ctx *gin.Context) {
 	s.getAction(ctx)
 }
 
-func postTriggerBucket(ctx *gin.Context) {
-	ctx.String(500, "POST trigger bucket not implemented yet")
+func (s *Server) postTriggerBucket(ctx *gin.Context) {
+	name := ctx.Param("name")
+	log.Printf("Triggering bucket %s\n", name)
+	s.worker.TriggerBucket(name)
+	ctx.String(200, "OK")
 }
 
-func postTriggerAction(ctx *gin.Context) {
-	ctx.String(500, "POST trigger action not implemented yet")
+func (s *Server) postTriggerAction(ctx *gin.Context) {
+	id := ctx.Param("id")
+	log.Printf("Triggering action %s\n", id)
+	s.worker.TriggerAction(id)
+	ctx.String(200, "OK")
 }
 
 func (s *Server) getBucket(ctx *gin.Context) {

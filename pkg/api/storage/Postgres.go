@@ -54,3 +54,9 @@ func (p *PostgresStore) FindAction(id string) data.Action {
 	p.db.First(&action, uuidId)
 	return action
 }
+
+func (p *PostgresStore) FindActionsByBucket(name string) []data.Action {
+	var actions []data.Action
+	p.db.Where("active = true AND bucket_name = ?", name).Find(&actions)
+	return actions
+}

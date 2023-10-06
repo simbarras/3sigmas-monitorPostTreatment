@@ -50,7 +50,17 @@ export const useActionStore = defineStore('action', () => {
         actionList.value.push(a)
     }
 
-    return {actionList, getActionList, fetchActions, uploadAction, deleteAction, preAddAction}
+    function triggerAction(action: Action){
+        axios.post(`${API_BASE}/trigger/action/${action.id}`)
+            .then(res => {
+                console.log(res.data)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
+    return {actionList, getActionList, fetchActions, uploadAction, deleteAction, preAddAction, triggerAction}
 
 })
 

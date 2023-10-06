@@ -1,3 +1,9 @@
+POST http://localhost:3001/api/v0/trigger/bucket/production.3s_230913.trimble
+
+###
+POST http://localhost:3001/api/v0/trigger/action/cc08b7fb-8a15-46a4-9654-5e85bce6edc1
+
+###
 DELETE localhost:3001/api/v0/action/cc08b7fb-8a15-46a4-9654-5e85bce6edc1
 Accept: application/json
 

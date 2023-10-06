@@ -8,6 +8,7 @@ import (
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -22,6 +23,46 @@ func BuildMeasure(listVariables [][]string, result []float64, dateTime time.Time
 		})
 	}
 	return measures
+}
+
+func isIn(is string, in []string) bool {
+	for _, s := range in {
+		if is == s {
+			return true
+		}
+	}
+	return false
+}
+
+func ParseVariables(brute string) ([]string, [][]string) {
+	brute = strings.ReplaceAll(brute, "\n", "")
+	brute = strings.ReplaceAll(brute, "\r", "")
+	brute = strings.ReplaceAll(brute, " ", "")
+	captors := make([]string, 0)
+	variables := make([][]string, 0)
+	for i, vs := range strings.Split(brute, ";") {
+		split := strings.Split(vs, ",")
+		if split[0] == "" {
+			break
+		}
+		variables = append(variables, make([]string, len(split)))
+		for j, v := range split {
+			variables[i][j] = v
+			if !isIn(v, captors) {
+				captors = append(captors, v)
+			}
+		}
+	}
+	return captors, variables
+}
+
+func GetEquation(equations []equation.Equation, name string) equation.Equation {
+	for _, eq := range equations {
+		if eq.Name() == name {
+			return eq
+		}
+	}
+	return nil
 }
 
 func DummyMain(environment data.Env) {

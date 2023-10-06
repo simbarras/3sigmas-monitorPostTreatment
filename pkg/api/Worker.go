@@ -1,28 +1,36 @@
 package api
 
 import (
+	"github.com/getsentry/sentry-go"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/api/storage"
+	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/acquisition"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/equation"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/data"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
+	"log"
+	"strings"
+	"time"
 )
 
 type Worker struct {
-	influx    *acquisition.Influx
-	postgres  *storage.PostgresStore
-	equations []equation.Equation
+	influxRead  *acquisition.Influx
+	postgres    *storage.PostgresStore
+	equations   []equation.Equation
+	influxStore *storer.InfluxStorer
 }
 
-func NewWorker(influx *acquisition.Influx, postgres *storage.PostgresStore, equations []equation.Equation) *Worker {
+func NewWorker(influx *acquisition.Influx, postgres *storage.PostgresStore, equations []equation.Equation, store *storer.InfluxStorer) *Worker {
 	return &Worker{
-		influx:    influx,
-		postgres:  postgres,
-		equations: equations,
+		influxRead:  influx,
+		postgres:    postgres,
+		equations:   equations,
+		influxStore: store,
 	}
 }
 
 func (w *Worker) GetBuckets() []string {
-	return w.influx.GetBuckets()
+	return w.influxRead.GetBuckets()
 }
 
 func (w *Worker) GetActions() []data.Action {
@@ -48,4 +56,29 @@ func (w *Worker) UpdateAction(action data.Action) {
 func (w *Worker) DeleteAction(id string) {
 	action := w.postgres.FindAction(id)
 	w.postgres.DeleteAction(action)
+}
+
+func (w *Worker) TriggerAction(id string) {
+	action := w.postgres.FindAction(id)
+	w.processAction(action)
+}
+
+func (w *Worker) TriggerBucket(name string) {
+	actions := w.postgres.FindActionsByBucket(name)
+	for _, action := range actions {
+		w.processAction(action)
+	}
+}
+
+func (w *Worker) processAction(action data.Action) {
+	log.Printf("Processing action %s\n", action.ID)
+	captors, variables := core.ParseVariables(action.ListVariables)
+	resultMap := w.influxRead.GetLastValue(action.BucketName, captors)
+	results := equation.ComputeAll(variables, resultMap, core.GetEquation(w.equations, action.EquationName))
+	measures := core.BuildMeasure(variables, results, time.Now(), action.EquationName)
+	err := w.influxStore.Store(strings.Split(action.BucketName, ".")[1], "computed", measures)
+	if err != nil {
+		sentry.CaptureException(err)
+		log.Fatal(err)
+	}
 }
