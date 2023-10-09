@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/data"
 	"log"
+	"sort"
 )
 
 type Server struct {
@@ -48,6 +49,15 @@ func SetRoutes(app *gin.Engine, prefix string, worker *Worker) {
 // getAction Get all actions
 func (s *Server) getAction(ctx *gin.Context) {
 	res := s.worker.GetActions()
+	sort.Slice(res, func(i, j int) bool {
+		if res[i].BucketName != res[j].BucketName {
+			return res[i].BucketName < res[j].BucketName
+		}
+		if res[i].EquationName != res[j].EquationName {
+			return res[i].EquationName < res[j].EquationName
+		}
+		return res[i].ID.String() < res[j].ID.String()
+	})
 	ctx.JSON(200, res)
 }
 
@@ -56,8 +66,7 @@ func (s *Server) postAction(ctx *gin.Context) {
 	err := ctx.BindJSON(&actionRequest)
 	if err != nil {
 		sentry.CaptureException(err)
-		ctx.String(500, "Error while parsing request")
-		log.Fatalf("Error while parsing request: %s\n", err)
+		log.Fatalf("Error while parsing request: %s\nResult: %v\n", err, actionRequest)
 	}
 	action := data.ToAction(actionRequest)
 	if action.ID == uuid.Nil {

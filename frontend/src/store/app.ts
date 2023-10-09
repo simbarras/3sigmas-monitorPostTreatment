@@ -30,7 +30,7 @@ export const useActionStore = defineStore('action', () => {
 
     function deleteAction(action: Action){
         console.log(action)
-        axios.delete(`${API_BASE}/action/${action.id}`)
+        axios.delete(`${API_BASE}/action/${action.idUuid}`)
             .then(res => {
                 console.log(res.data)
                 actionList.value = res.data as Action[]
@@ -51,7 +51,7 @@ export const useActionStore = defineStore('action', () => {
     }
 
     function triggerAction(action: Action){
-        axios.post(`${API_BASE}/trigger/action/${action.id}`)
+        axios.post(`${API_BASE}/trigger/action/${action.idUuid}`)
             .then(res => {
                 console.log(res.data)
             })

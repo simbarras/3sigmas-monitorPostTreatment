@@ -1,7 +1,7 @@
 <template>
   <v-card title="Action" variant="tonal" style="margin-bottom: 2rem;">
     <v-card-subtitle>
-      {{existAction.id}}
+      {{existAction.idUuid}}
     </v-card-subtitle>
     <v-form>
       <v-container>

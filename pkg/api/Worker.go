@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/getsentry/sentry-go"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/api/storage"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core"
@@ -58,27 +59,38 @@ func (w *Worker) DeleteAction(id string) {
 	w.postgres.DeleteAction(action)
 }
 
-func (w *Worker) TriggerAction(id string) {
+func (w *Worker) TriggerAction(id string) error {
 	action := w.postgres.FindAction(id)
-	w.processAction(action)
+	err := w.processAction(action)
+	return err
 }
 
-func (w *Worker) TriggerBucket(name string) {
+func (w *Worker) TriggerBucket(name string) error {
 	actions := w.postgres.FindActionsByBucket(name)
 	for _, action := range actions {
-		w.processAction(action)
+		err := w.processAction(action)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (w *Worker) processAction(action data.Action) {
+func (w *Worker) processAction(action data.Action) error {
 	log.Printf("Processing action %s\n", action.ID)
 	captors, variables := core.ParseVariables(action.ListVariables)
+	if captors == nil || variables == nil {
+		return errors.New("error while parsing variables")
+	}
+	log.Printf("Captors: %v\nVariables: %v\n", captors, variables)
+
 	resultMap := w.influxRead.GetLastValue(action.BucketName, captors)
 	results := equation.ComputeAll(variables, resultMap, core.GetEquation(w.equations, action.EquationName))
 	measures := core.BuildMeasure(variables, results, time.Now(), action.EquationName)
 	err := w.influxStore.Store(strings.Split(action.BucketName, ".")[1], "computed", measures)
 	if err != nil {
 		sentry.CaptureException(err)
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }

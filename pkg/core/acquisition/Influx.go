@@ -6,6 +6,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
+	ownData "github.com/simbarras/3sigmas-monitorPostTreatment/pkg/data"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"log"
 )
@@ -41,7 +42,7 @@ func (i *Influx) GetBuckets() []string {
 	return result
 }
 
-func (i *Influx) GetLastValue(bucketName string, captors []string) map[string]float64 {
+func (i *Influx) GetLastValue(bucketName string, captors []ownData.CaptorValue) map[string]float64 {
 	resultMap := make(map[string]float64)
 	for _, captor := range captors {
 		bucket, err := i.client.BucketsAPI().FindBucketByName(context.Background(), bucketName)
@@ -53,7 +54,7 @@ func (i *Influx) GetLastValue(bucketName string, captors []string) map[string]fl
 		queryAPI := i.client.QueryAPI(i.organization.Name)
 
 		// Define the InfluxQL query to retrieve the last value from the measurement
-		query := fmt.Sprintf("from(bucket:\"%s\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"%s\") |> filter(fn: (r) => r[\"_field\"] == \"%s\") |> last()", bucket.Name, captor, "northing")
+		query := fmt.Sprintf("from(bucket:\"%s\") |> range(start: 0) |> filter(fn: (r) => r[\"_measurement\"] == \"%s\") |> filter(fn: (r) => r[\"_field\"] == \"%s\") |> last()", bucket.Name, captor.Captor, captor.Field)
 
 		// Execute the query
 		result, err := queryAPI.Query(context.Background(), query)
@@ -64,7 +65,7 @@ func (i *Influx) GetLastValue(bucketName string, captors []string) map[string]fl
 
 		// Process the query result
 		for result.Next() {
-			resultMap[captor] = result.Record().Value().(float64)
+			resultMap[captor.String()] = result.Record().Value().(float64)
 		}
 
 		// Check for errors from iterating over the result

@@ -7,7 +7,7 @@ import (
 
 type Action struct {
 	gorm.Model
-	ID            uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()" json:"id"`
+	ID            uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()" json:"idUuid"`
 	BucketName    string    `json:"bucketName"`
 	EquationName  string    `json:"equationName"`
 	ListVariables string    `json:"listVariables"`
@@ -29,7 +29,7 @@ func ToAction(request AddActionRequest) Action {
 }
 
 type AddActionRequest struct {
-	ID            string `json:"id"`
+	ID            string `json:"idUuid"`
 	BucketName    string `json:"bucketName"`
 	EquationName  string `json:"equationName"`
 	ListVariables string `json:"listVariables"`

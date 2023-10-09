@@ -42,7 +42,7 @@ func main() {
 
 	store := storage.NewPostgres()
 	influxStore := storer.NewInfluxStorer(environment)
-	equations := []equation.Equation{equation.Addition{}, equation.Fleche{}}
+	equations := []equation.Equation{equation.FlecheV{}}
 	worker := api.NewWorker(acquisition.NewInflux(environment), store, equations, influxStore)
 
 	// Set up routes

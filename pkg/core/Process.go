@@ -8,44 +8,52 @@ import (
 	"time"
 )
 
-func BuildMeasure(listVariables [][]string, result []float64, dateTime time.Time, function string) []data.Measure {
+func BuildMeasure(listVariables [][]ownData.CaptorValue, result []float64, dateTime time.Time, function string) []data.Measure {
 	measures := make([]data.Measure, 0)
 	for i, variables := range listVariables {
+		variablesString := make([]string, len(variables))
+		for j, v := range variables {
+			variablesString[j] = v.String()
+
+		}
 		measures = append(measures, ownData.ComputedMeasure{
 			DateTime:  dateTime,
 			Value:     result[i],
 			Captor:    function,
-			Variables: variables,
+			Variables: variablesString,
 		})
 	}
 	return measures
 }
 
-func isIn(is string, in []string) bool {
+func isIn(is string, in []ownData.CaptorValue) bool {
 	for _, s := range in {
-		if is == s {
+		if is == s.String() {
 			return true
 		}
 	}
 	return false
 }
 
-func ParseVariables(brute string) ([]string, [][]string) {
+func ParseVariables(brute string) ([]ownData.CaptorValue, [][]ownData.CaptorValue) {
 	brute = strings.ReplaceAll(brute, "\n", "")
 	brute = strings.ReplaceAll(brute, "\r", "")
 	brute = strings.ReplaceAll(brute, " ", "")
-	captors := make([]string, 0)
-	variables := make([][]string, 0)
+	captors := make([]ownData.CaptorValue, 0)
+	variables := make([][]ownData.CaptorValue, 0)
 	for i, vs := range strings.Split(brute, ";") {
 		split := strings.Split(vs, ",")
 		if split[0] == "" {
 			break
 		}
-		variables = append(variables, make([]string, len(split)))
+		variables = append(variables, make([]ownData.CaptorValue, len(split)))
 		for j, v := range split {
-			variables[i][j] = v
+			err := variables[i][j].FromString(v)
+			if err != nil {
+				return nil, nil
+			}
 			if !isIn(v, captors) {
-				captors = append(captors, v)
+				captors = append(captors, variables[i][j])
 			}
 		}
 	}
