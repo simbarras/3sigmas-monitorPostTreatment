@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/api"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/api/storage"
-	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/acquisition"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/equation"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
@@ -54,7 +53,5 @@ func main() {
 	if err != nil {
 		return
 	}
-
-	core.DummyMain(environment)
 
 }
