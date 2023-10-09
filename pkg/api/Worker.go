@@ -10,7 +10,6 @@ import (
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
 	"log"
 	"strings"
-	"time"
 )
 
 type Worker struct {
@@ -81,9 +80,9 @@ func (w *Worker) processAction(action data.Action) error {
 	if err != nil {
 		return err
 	}
-	resultMap := w.influxRead.GetLastValue(action.BucketName, captors)
+	resultMap, t := w.influxRead.GetLastValue(action.BucketName, captors)
 	results := equation.ComputeAll(variables, resultMap, core.GetEquation(w.equations, action.EquationName))
-	measures := core.BuildMeasure(variables, results, time.Now(), action.EquationName)
+	measures := core.BuildMeasure(variables, results, t, action.EquationName)
 	err = w.influxStore.Store(strings.Split(action.BucketName, ".")[1], "computed", measures)
 	if err != nil {
 		sentry.CaptureException(err)

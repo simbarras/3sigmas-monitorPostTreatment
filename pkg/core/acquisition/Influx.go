@@ -9,6 +9,7 @@ import (
 	ownData "github.com/simbarras/3sigmas-monitorPostTreatment/pkg/data"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"log"
+	"time"
 )
 
 type Influx struct {
@@ -42,8 +43,9 @@ func (i *Influx) GetBuckets() []string {
 	return result
 }
 
-func (i *Influx) GetLastValue(bucketName string, captors []ownData.CaptorValue) map[string]float64 {
+func (i *Influx) GetLastValue(bucketName string, captors []ownData.CaptorValue) (map[string]float64, time.Time) {
 	resultMap := make(map[string]float64)
+	newestTime := time.Time{}
 	for _, captor := range captors {
 		bucket, err := i.client.BucketsAPI().FindBucketByName(context.Background(), bucketName)
 		if err != nil {
@@ -66,6 +68,9 @@ func (i *Influx) GetLastValue(bucketName string, captors []ownData.CaptorValue) 
 		// Process the query result
 		for result.Next() {
 			resultMap[captor.String()] = result.Record().Value().(float64)
+			if result.Record().Time().After(newestTime) {
+				newestTime = result.Record().Time()
+			}
 		}
 
 		// Check for errors from iterating over the result
@@ -74,5 +79,5 @@ func (i *Influx) GetLastValue(bucketName string, captors []ownData.CaptorValue) 
 			log.Fatal(result.Err())
 		}
 	}
-	return resultMap
+	return resultMap, newestTime
 }
