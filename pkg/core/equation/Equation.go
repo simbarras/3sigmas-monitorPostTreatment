@@ -7,10 +7,10 @@ type Equation interface {
 	Name() string
 }
 
-func ComputeAll(listVariables [][]ownData.CaptorValue, values map[string]float64, eq Equation) []float64 {
+func ComputeAll(listVariables []ownData.EquationCaptor, values map[string]float64, eq Equation) []float64 {
 	result := make([]float64, len(listVariables))
 	for i, variables := range listVariables {
-		result[i] = eq.Compute(variables, values)
+		result[i] = eq.Compute(variables.Captors, values)
 	}
 	return result
 }

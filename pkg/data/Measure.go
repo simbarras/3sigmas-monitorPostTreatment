@@ -9,7 +9,7 @@ type ComputedMeasure struct {
 	DateTime  time.Time
 	Value     float64
 	Captor    string
-	Variables []string
+	Variables string
 }
 
 func (m ComputedMeasure) String() string {
@@ -17,12 +17,8 @@ func (m ComputedMeasure) String() string {
 }
 
 func (m ComputedMeasure) Tags() map[string]string {
-	tag := ""
-	for _, variable := range m.Variables {
-		tag += variable + ";"
-	}
 	return map[string]string{
-		"captors": tag,
+		"captors": m.Variables,
 	}
 }
 

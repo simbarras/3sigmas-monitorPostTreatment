@@ -89,14 +89,24 @@ func (s *Server) deleteAction(ctx *gin.Context) {
 func (s *Server) postTriggerBucket(ctx *gin.Context) {
 	name := ctx.Param("name")
 	log.Printf("Triggering bucket %s\n", name)
-	s.worker.TriggerBucket(name)
+	err := s.worker.TriggerBucket(name)
+	if err != nil {
+		sentry.CaptureException(err)
+		ctx.String(500, err.Error())
+		log.Printf("Error while triggering bucket %s: %s\n", name, err)
+	}
 	ctx.String(200, "OK")
 }
 
 func (s *Server) postTriggerAction(ctx *gin.Context) {
 	id := ctx.Param("id")
 	log.Printf("Triggering action %s\n", id)
-	s.worker.TriggerAction(id)
+	err := s.worker.TriggerAction(id)
+	if err != nil {
+		sentry.CaptureException(err)
+		ctx.String(500, err.Error())
+		log.Printf("Error while triggering action %s: %s\n", id, err)
+	}
 	ctx.String(200, "OK")
 }
 
