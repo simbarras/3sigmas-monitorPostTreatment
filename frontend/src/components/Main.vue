@@ -2,7 +2,7 @@
   <v-container class="fill-height">
 
     <v-responsive class="align-center text-center fill-height">
-      <div v-for="action in actions" :key="action.id">
+      <div v-for="action in actions" :key="action.idUuid">
         <ActionItem :existAction="action" :bucketList="buckets" :equationList="equations"/>
       </div>
       <v-btn prepend-icon="mdi-plus-circle" variant="tonal" size="x-large" elevation="24" rounded="xl" style="margin-bottom: 5rem" @click="actionStore.preAddAction()">

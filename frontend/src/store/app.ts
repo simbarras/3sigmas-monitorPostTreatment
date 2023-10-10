@@ -21,14 +21,14 @@ export const useActionStore = defineStore('action', () => {
             })
     }
 
-    function uploadAction(action: Action){
+    function uploadAction(action: any){
         axios.post(`${API_BASE}/action`, action)
             .then(res => {
                 actionList.value = res.data as Action[]
             })
     }
 
-    function deleteAction(action: Action){
+    function deleteAction(action: any){
         console.log(action)
         axios.delete(`${API_BASE}/action/${action.idUuid}`)
             .then(res => {
@@ -50,7 +50,7 @@ export const useActionStore = defineStore('action', () => {
         actionList.value.push(a)
     }
 
-    function triggerAction(action: Action){
+    function triggerAction(action: any){
         axios.post(`${API_BASE}/trigger/action/${action.idUuid}`)
             .then(res => {
                 console.log(res.data)

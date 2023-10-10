@@ -73,16 +73,13 @@
 
 <script lang="ts" setup>
 
-import {defineProps} from "vue";
-import {Action} from "@/plugins/data";
 import {useActionStore} from "@/store/app";
-import axios from "axios";
 
 const actionStore = useActionStore();
 
 defineProps({
   existAction: {
-    type: Object as Action,
+    type: Object,
     required: true
   },
   bucketList: {

@@ -1,11 +1,11 @@
-name: Pipeline
+name: Backend
 
 on:
   - push
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/post-treatment
+  IMAGE_NAME: ${{ github.repository }}/backend-post-treatment
   IMAGE_VERSION: 0.0.1
 
 jobs:
