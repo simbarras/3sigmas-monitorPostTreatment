@@ -4,7 +4,7 @@ import axios from "axios";
 import {computed, ref} from "vue";
 import {Action} from "@/plugins/data";
 
-const API_URL = 'http://localhost:3001'
+const API_URL = 'http://post-treatment:3001'
 const API_VERSION = 'v0'
 const API_BASE = `${API_URL}/api/${API_VERSION}`
 

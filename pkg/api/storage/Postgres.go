@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	"github.com/getsentry/sentry-go"
 	"github.com/google/uuid"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/data"
@@ -12,8 +13,9 @@ type PostgresStore struct {
 	db *gorm.DB
 }
 
-func NewPostgres() *PostgresStore {
-	dsn := "host=localhost user=GO password=PASSWORD dbname=GORM port=5432 sslmode=disable TimeZone=Europe/Zurich"
+func NewPostgres(env data.Env) *PostgresStore {
+	//dsn := "host=localhost user=GO password=PASSWORD dbname=GORM port=5432 sslmode=disable TimeZone=Europe/Zurich"
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Europe/Zurich", env.PostgresHost, env.PostgresUser, env.PostgresPassword, env.PostgresDbname)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		sentry.CaptureException(err)

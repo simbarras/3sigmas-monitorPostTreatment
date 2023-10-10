@@ -17,5 +17,6 @@ RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux GIN_MODE=release go build -ldflags="-w
 FROM alpine AS postTreatment
 # Copy our static executable.
 COPY --from=builder /go/bin/postTreatment /go/bin/app
+EXPOSE 3001
 ENTRYPOINT ["/go/bin/app"]
 

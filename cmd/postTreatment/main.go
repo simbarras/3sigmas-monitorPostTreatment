@@ -8,12 +8,12 @@ import (
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/api/storage"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/acquisition"
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/core/equation"
-	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
+	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/data"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
 	"log"
 )
 
-const Version = "0.0.1"
+const Version = "0.0.2"
 const ApiPrefix = "/api/v0"
 
 func main() {
@@ -40,16 +40,16 @@ func main() {
 	log.Printf("App started in release %s\n", Version)
 	environment := data.ReadEnv()
 
-	store := storage.NewPostgres()
-	influxStore := storer.NewInfluxStorer(environment)
+	store := storage.NewPostgres(environment)
+	influxStore := storer.NewInfluxStorer(environment.ExternEnv)
 	equations := []equation.Equation{equation.FlecheV{}}
-	worker := api.NewWorker(acquisition.NewInflux(environment), store, equations, influxStore)
+	worker := api.NewWorker(acquisition.NewInflux(environment.ExternEnv), store, equations, influxStore)
 
 	// Set up routes
 	api.SetRoutes(app, ApiPrefix, worker)
 
 	// And run it
-	err := app.Run("localhost:3001")
+	err := app.Run("0.0.0.0:3001")
 	if err != nil {
 		return
 	}

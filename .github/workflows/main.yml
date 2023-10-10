@@ -7,7 +7,7 @@ env:
   REGISTRY: ghcr.io
   BACKEND_IMAGE_NAME: ${{ github.repository }}/backend-post-treatment
   FRONTEND_IMAGE_NAME: ${{ github.repository }}/frontend-post-treatment
-  IMAGE_VERSION: 0.0.1
+  IMAGE_VERSION: 0.0.2
 
 jobs:
   backend-test:
