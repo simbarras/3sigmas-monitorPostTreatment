@@ -5,7 +5,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/backend-post-treatment
+  BACKEND_IMAGE_NAME: ${{ github.repository }}/backend-post-treatment
+    FRONTEND_IMAGE_NAME: ${{ github.repository }}/frontend-post-treatment
   IMAGE_VERSION: 0.0.1
 
 jobs:
@@ -43,7 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4.6.0
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.1.1
         with:
@@ -77,7 +78,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4.6.0
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.1.1
         with:
