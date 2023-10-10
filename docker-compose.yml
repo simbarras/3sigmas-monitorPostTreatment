@@ -15,3 +15,10 @@ services:
       - POSTGRES_PASSWORD=PASSWORD
     volumes:
       - ./db:/var/lib/postgresql/data
+
+  webapp:
+    container_name: webapp-3sigmas
+    image: ghcr.io/simbarras/3sigmas-monitorposttreatment/frontend-post-treatment:develop-0.0.0
+    restart: unless-stopped
+    ports:
+      - "80:80"

@@ -6,9 +6,7 @@ RUN npm install --save-dev
 COPY . .
 RUN npm run build
 
-FROM nginx:alpine as production
-RUN mkdir "/app"
-COPY --from=builder /app/dist /app/dist
-COPY nginx.conf /etc/nginx/nginx.conf
+FROM nginx:stable-alpine as production
+COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
 ENTRYPOINT ["nginx","-g","daemon off;"]
