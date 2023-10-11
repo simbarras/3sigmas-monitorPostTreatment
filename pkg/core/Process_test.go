@@ -342,6 +342,34 @@ func TestParseVariables(t *testing.T) {
 	log.Printf("passed\n")
 }
 
+func TestParseVariables_constant(t *testing.T) {
+	brute := "1:${42};"
+	log.Printf("Testing %s ", brute)
+	expectedCaptors := []data.CaptorValue{
+		{
+			Captor: "$",
+			Field:  "42",
+		},
+	}
+	expectedVariables := []data.EquationCaptor{
+		{
+			Name: "1",
+			Captors: []data.CaptorValue{
+				{
+					Captor: "$",
+					Field:  "42",
+				},
+			},
+		},
+	}
+	captors, variables, err := ParseVariables(brute)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	testCaptorVariables(expectedCaptors, captors, expectedVariables, variables, t)
+}
+
 func FuzzParseVariables(f *testing.F) {
 	f.Add("A;B;C;")
 	f.Add("A,B,C;D,E,F;")

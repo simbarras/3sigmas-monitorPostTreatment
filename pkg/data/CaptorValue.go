@@ -15,6 +15,11 @@ func (captorValue *CaptorValue) String() string {
 }
 
 func (captorValue *CaptorValue) FromString(s string) error {
+	if strings.HasPrefix(s, "$") {
+		captorValue.Captor = "$"
+		captorValue.Field = s[2 : len(s)-1]
+		return nil
+	}
 	split := strings.Split(s, ".")
 	if len(split) != 2 {
 		return errors.New("invalid captor value")
