@@ -8,7 +8,7 @@ RUN apk update && apk add --no-cache git build-base
 WORKDIR $GOPATH/src/mypackage/myapp/
 COPY . .
 # Build the binary.
-RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags="-w -s" -o /go/bin/postTreatment cmd/postTreatment/main.go
+RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux GIN_MODE=release go build -ldflags="-w -s" -o /go/bin/postTreatment cmd/postTreatment/main.go
 
 ############################
 # STEP 2 build a small image
@@ -17,5 +17,6 @@ RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags="-w -s" -o /go/bin/p
 FROM alpine AS postTreatment
 # Copy our static executable.
 COPY --from=builder /go/bin/postTreatment /go/bin/app
+EXPOSE 3001
 ENTRYPOINT ["/go/bin/app"]
 

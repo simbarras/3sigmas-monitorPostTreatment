@@ -5,11 +5,12 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/post-treatment
-  IMAGE_VERSION: 0.0.1
+  BACKEND_IMAGE_NAME: ${{ github.repository }}/backend-post-treatment
+  FRONTEND_IMAGE_NAME: ${{ github.repository }}/frontend-post-treatment
+  IMAGE_VERSION: 0.1.0
 
 jobs:
-  test:
+  backend-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +24,9 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  build-and-push-image:
+  backend-image:
     needs:
-      - test
+      - backend-test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -43,7 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4.6.0
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.1.1
         with:
@@ -52,5 +53,41 @@ jobs:
           target: postTreatment
           push: true
           tags: ${{ steps.meta.outputs.tags }}-${{ env.IMAGE_VERSION }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  frontend-image:
+    needs:
+      - backend-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.0
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: ./frontend
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3.0.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4.1.1
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          target: production
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}-${{ steps.package-version.outputs.current-version }}
           labels: ${{ steps.meta.outputs.labels }}
 
