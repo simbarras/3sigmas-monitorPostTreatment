@@ -5,19 +5,9 @@ import (
 	"math"
 )
 
-type FlecheV struct{}
+type FlecheHZ struct{}
 
-func coefficient(av1, av9, av2, av10, av17, av18 float64) float64 {
-	up := math.Sqrt((av1-av9)*(av1-av9) + (av2-av10)*(av2-av10))
-	down := math.Sqrt((av1-av17)*(av1-av17) + (av2-av18)*(av2-av18))
-	return up / down
-}
-
-func part(a, b, c, coef float64) float64 {
-	return a - b + (c-b)*coef
-}
-
-func (FlecheV) Compute(variables []ownData.CaptorValue, values map[string]float64) float64 {
+func (FlecheHZ) Compute(variables []ownData.CaptorValue, values map[string]float64) float64 {
 	var1 := values[variables[0].String()]
 	var2 := values[variables[1].String()]
 	var3 := values[variables[2].String()]
@@ -56,12 +46,16 @@ func (FlecheV) Compute(variables []ownData.CaptorValue, values map[string]float6
 	av19 := average(var19, var23)
 	av20 := average(var20, var24)
 
-	coef := coefficient(av1, av9, av2, av10, av17, av18)
-	pLeft := part(av12, av4, av20, coef)
-	pRight := part(av11, av3, av19, coef)
-	return pLeft - pRight
+	phi13 := math.Atan((av19 - av3) / (av20 - av4))
+	phi12 := math.Atan((av11 - av3) / (av12 - av4))
+	dist12 := math.Sqrt((av10-av2)*(av10-av2) + (av9-av1)*(av9-av1))
+
+	phi13Ref := math.Atan((av17 - av1) / (av18 - av2))
+	phi12Ref := math.Atan((av9 - av1) / (av10 - av2))
+
+	return (((phi13 - phi12) * dist12) - ((phi13Ref - phi12Ref) * dist12)) * 1000.0
 }
 
-func (FlecheV) Name() string {
-	return "FlecheV"
+func (FlecheHZ) Name() string {
+	return "FlecheHz"
 }

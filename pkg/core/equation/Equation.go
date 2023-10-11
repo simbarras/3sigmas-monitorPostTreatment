@@ -14,3 +14,7 @@ func ComputeAll(listVariables []ownData.EquationCaptor, values map[string]float6
 	}
 	return result
 }
+
+func average(a, b float64) float64 {
+	return a/2.0 + b/2.0
+}

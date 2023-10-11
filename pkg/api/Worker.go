@@ -10,7 +10,9 @@ import (
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
 	"log"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type Worker struct {
@@ -77,13 +79,35 @@ func (w *Worker) TriggerBucket(name string) error {
 	return nil
 }
 
+func (w *Worker) GetLastValues(bucketName string, captors []data.CaptorValue) (map[string]float64, time.Time) {
+	resultMap := make(map[string]float64)
+	newestTime := time.Time{}
+	for _, captor := range captors {
+		if captor.Captor == "$" {
+			value, err := strconv.ParseFloat(captor.Field, 64)
+			if err != nil {
+				sentry.CaptureException(err)
+				log.Fatal(err)
+			}
+			resultMap[captor.String()] = value
+		} else {
+			value, t := w.influxRead.GetLastValue(bucketName, captor)
+			resultMap[captor.String()] = value
+			if t.After(newestTime) {
+				newestTime = t
+			}
+		}
+	}
+	return resultMap, newestTime
+}
+
 func (w *Worker) processAction(action data.Action) error {
 	log.Printf("Processing action %s\n", action.ID)
 	captors, variables, err := core.ParseVariables(action.ListVariables)
 	if err != nil {
 		return err
 	}
-	resultMap, t := w.influxRead.GetLastValue(action.BucketName, captors)
+	resultMap, t := w.GetLastValues(action.BucketName, captors)
 	results := equation.ComputeAll(variables, resultMap, core.GetEquation(w.equations, action.EquationName))
 	measures := core.BuildMeasure(variables, results, t, action.EquationName)
 	err = w.influxStore.Store(strings.Split(action.BucketName, ".")[1], "computed", measures)

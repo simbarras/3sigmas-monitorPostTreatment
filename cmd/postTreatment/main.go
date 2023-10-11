@@ -13,7 +13,7 @@ import (
 	"log"
 )
 
-const Version = "0.1.0"
+const Version = "0.2.0"
 const ApiPrefix = "/api/v0"
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 
 	store := storage.NewPostgres(environment)
 	influxStore := storer.NewInfluxStorer(environment.ExternEnv)
-	equations := []equation.Equation{equation.FlecheV{}}
+	equations := []equation.Equation{equation.Gauche{}, equation.FlecheV{}, equation.FlecheHZ{}, equation.Inclinaison{}}
 	worker := api.NewWorker(acquisition.NewInflux(environment.ExternEnv), store, equations, influxStore)
 
 	// Set up routes
