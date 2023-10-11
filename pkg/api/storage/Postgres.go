@@ -15,7 +15,7 @@ type PostgresStore struct {
 
 func NewPostgres(env data.Env) *PostgresStore {
 	//dsn := "host=localhost user=GO password=PASSWORD dbname=GORM port=5432 sslmode=disable TimeZone=Europe/Zurich"
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Europe/Zurich", env.PostgresHost, env.PostgresUser, env.PostgresPassword, env.PostgresDbname)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Zurich", env.PostgresHost, env.PostgresUser, env.PostgresPassword, env.PostgresDbname, env.PostgresPort)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		sentry.CaptureException(err)

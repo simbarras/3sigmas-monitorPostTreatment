@@ -11,6 +11,7 @@ type Env struct {
 	PostgresUser     string
 	PostgresHost     string
 	PostgresDbname   string
+	PostgresPort     string
 }
 
 func ReadEnv() Env {
@@ -20,6 +21,7 @@ func ReadEnv() Env {
 		PostgresUser:     os.Getenv("POSTGRES_USER"),
 		PostgresHost:     os.Getenv("POSTGRES_HOST"),
 		PostgresDbname:   os.Getenv("POSTGRES_DBNAME"),
+		PostgresPort:     os.Getenv("POSTGRES_PORT"),
 	}
 	return env
 }
