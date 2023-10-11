@@ -6,9 +6,7 @@ services:
     image: postgres:14.0-alpine
     restart: unless-stopped
     ports:
-      - "5432:5432"
-    expose:
-      - 5432
+      - "5433:5432"
     environment:
       - POSTGRES_DB=GORM
       - POSTGRES_USER=GO
@@ -25,7 +23,7 @@ services:
 
   post-treatment:
     container_name: post-treatment
-    image: ghcr.io/simbarras/3sigmas-monitorposttreatment/backend-post-treatment:develop-0.0.2
+    image: ghcr.io/simbarras/3sigmas-monitorposttreatment/backend-post-treatment:develop-0.0.3
     restart: unless-stopped
     ports:
       - "3001:3001"
@@ -43,3 +41,4 @@ services:
       - POSTGRES_HOST=db
       - POSTGRES_PASSWORD=PASSWORD
       - POSTGRES_USER=GO
+      - POSTGRES_PORT=5432

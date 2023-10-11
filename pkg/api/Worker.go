@@ -9,6 +9,7 @@ import (
 	"github.com/simbarras/3sigmas-monitorPostTreatment/pkg/data"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
 	"log"
+	"sort"
 	"strings"
 )
 
@@ -29,7 +30,9 @@ func NewWorker(influx *acquisition.Influx, postgres *storage.PostgresStore, equa
 }
 
 func (w *Worker) GetBuckets() []string {
-	return w.influxRead.GetBuckets()
+	buckets := w.influxRead.GetBuckets()
+	sort.Strings(buckets)
+	return buckets
 }
 
 func (w *Worker) GetActions() []data.Action {
