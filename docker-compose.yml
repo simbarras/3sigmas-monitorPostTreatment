@@ -18,7 +18,28 @@ services:
 
   webapp:
     container_name: webapp-3sigmas
-    image: ghcr.io/simbarras/3sigmas-monitorposttreatment/frontend-post-treatment:develop-0.0.1
+    image: ghcr.io/simbarras/3sigmas-monitorposttreatment/frontend-post-treatment:develop-0.0.2
     restart: unless-stopped
     ports:
       - "8083:80"
+
+  post-treatment:
+    container_name: post-treatment
+    image: ghcr.io/simbarras/3sigmas-monitorposttreatment/backend-post-treatment:develop-0.0.2
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - FTP_LOCAL_PATH=./backup
+      - FTP_PASSWORD=GUEST3sigmas
+      - FTP_SERVER_PATH=/grafana-test
+      - FTP_SERVER_URL=ftp.cluster020.hosting.ovh.net
+      - FTP_USER=sigmaschcy-guest
+      - INFLUX_ORG=3sigmas
+      - INFLUX_PREFIX=test
+      - INFLUX_TOKEN=-LSlQXq0uRiNrRuO5gtRg8g75aCU8_9S7ez2tGnfVjQBBaUkby_mXkpQSI9qqoxY0KF1EfGfnevwR6Uo4zG35g==
+      - INFLUX_URL=http://192.168.1.158:8086
+      - POSTGRES_DBNAME=GORM
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=PASSWORD
+      - POSTGRES_USER=GO
